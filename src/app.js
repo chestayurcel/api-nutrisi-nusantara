@@ -6,6 +6,7 @@ require('dotenv').config();
 const ingredientRoutes = require('./routes/ingredientRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 const calculatorRoutes = require('./routes/calculatorRoutes');
+const authRoutes = require('./routes/authRoutes');
 const apiKeyAuth = require('./middleware/apiKeyMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./config/swagger');
@@ -27,6 +28,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/api/v1/ingredients', apiKeyAuth, ingredientRoutes);
 app.use('/api/v1/recipes', apiKeyAuth, recipeRoutes);
 app.use('/api/v1/calculate', apiKeyAuth, calculatorRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 // === Test Route ===
 app.get('/', (req, res) => {
