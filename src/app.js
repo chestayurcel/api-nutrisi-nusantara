@@ -8,7 +8,7 @@ const recipeRoutes = require('./routes/recipeRoutes');
 const calculatorRoutes = require('./routes/calculatorRoutes');
 const apiKeyAuth = require('./middleware/apiKeyMiddleware');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./src/config/swagger');
+const swaggerSpecs = require('./config/swagger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
