@@ -7,6 +7,8 @@ const ingredientRoutes = require('./routes/ingredientRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 const calculatorRoutes = require('./routes/calculatorRoutes');
 const apiKeyAuth = require('./middleware/apiKeyMiddleware');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./src/config/swagger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +19,9 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// === Documentation Route ===
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // === Routes ===
 app.use('/api/v1/ingredients', apiKeyAuth, ingredientRoutes);
