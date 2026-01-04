@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
+const ingredientRoutes = require('./routes/ingredientRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +15,10 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// === Test Route (Untuk Cek Server Nyala) ===
+// === Routes ===
+app.use('/api/v1/ingredients', ingredientRoutes);
+
+// === Test Route ===
 app.get('/', (req, res) => {
     res.json({
         message: 'Selamat Datang di API Nutrisi & Resep Nusantara',
