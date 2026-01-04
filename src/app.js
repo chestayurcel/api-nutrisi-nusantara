@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 const ingredientRoutes = require('./routes/ingredientRoutes');
+const recipeRoutes = require('./routes/recipeRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // === Routes ===
 app.use('/api/v1/ingredients', ingredientRoutes);
+app.use('/api/v1/recipes', recipeRoutes);
 
 // === Test Route ===
 app.get('/', (req, res) => {
