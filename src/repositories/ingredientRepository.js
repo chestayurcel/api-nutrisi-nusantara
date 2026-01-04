@@ -7,22 +7,23 @@ const getAll = async (keyword, limit, offset) => {
         WHERE name LIKE ? 
         LIMIT ? OFFSET ?
     `;
-    const params = [`%${keyword}%`, limit, offset];
     
-    const [rows] = await db.execute(sql, params);
+    const params = [`%${keyword}%`, parseInt(limit), parseInt(offset)];
+    
+    const [rows] = await db.query(sql, params); 
     return rows;
 };
 
 const countTotal = async (keyword) => {
     const sql = `SELECT COUNT(*) as total FROM ingredients WHERE name LIKE ?`;
-    const [rows] = await db.execute(sql, [`%${keyword}%`]);
+    const [rows] = await db.query(sql, [`%${keyword}%`]);
     return rows[0].total;
 };
 
 const getById = async (id) => {
     const sql = `SELECT * FROM ingredients WHERE id = ?`;
-    const [rows] = await db.execute(sql, [id]);
-    return rows[0];
+    const [rows] = await db.query(sql, [id]); 
+    return rows[0]; 
 };
 
 module.exports = {
