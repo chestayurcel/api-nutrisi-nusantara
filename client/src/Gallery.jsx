@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button, Modal, Spinner, Badge, ListGroup, Fo
 // Konfigurasi API
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 // PENTING: Gunakan salah satu API Key yang valid dari database Anda
-const API_KEY = 'SECRET-KEY-12345'; 
+const API_KEY = 'sk-nusa-fc387d41c90fd647d52c1314d6a42772';
 
 function Gallery() {
   const [recipes, setRecipes] = useState([]);
