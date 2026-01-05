@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Navbar, Row, Col, Card, Button, Modal, Spinner, Badge, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Modal, Spinner, Badge, ListGroup, Form, InputGroup } from 'react-bootstrap';
 
+// Konfigurasi API
 const API_BASE_URL = 'http://localhost:3000/api/v1';
-const API_KEY = 'SECRET-KEY-12345';
+// PENTING: Gunakan salah satu API Key yang valid dari database Anda
+const API_KEY = 'SECRET-KEY-12345'; 
 
 function Gallery() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Fitur Pencarian
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // State Modal Detail
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
@@ -18,13 +26,16 @@ function Gallery() {
 
   const fetchRecipes = async () => {
     try {
+      setLoading(true);
+      // Request ke Backend
       const response = await axios.get(`${API_BASE_URL}/recipes`, {
         headers: { 'x-api-key': API_KEY }
       });
       setRecipes(response.data.data);
       setLoading(false);
-    } catch (error) {
-      console.error("Gagal mengambil data:", error);
+    } catch (err) {
+      console.error("Gagal mengambil data:", err);
+      setError("Gagal memuat resep. Pastikan server backend menyala.");
       setLoading(false);
     }
   };
@@ -32,7 +43,6 @@ function Gallery() {
   // 2. Fetch Detail Resep saat tombol diklik
   const handleShowDetail = async (id) => {
     try {
-      // Tampilkan modal loading dulu (opsional) atau langsung fetch
       const response = await axios.get(`${API_BASE_URL}/recipes/${id}`, {
         headers: { 'x-api-key': API_KEY }
       });
@@ -43,135 +53,188 @@ function Gallery() {
     }
   };
 
-  const handleClose = () => {
-    setShowModal(false);
-    setSelectedRecipe(null);
-  };
+  // Logic Filter Pencarian
+  const filteredRecipes = recipes.filter(recipe => 
+    recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="bg-light min-vh-100">
+    <>
+      {/* --- HERO SECTION (BANNER ATAS) --- */}
+      <div className="hero-section text-center">
+        <Container>
+            <h1 className="display-4 fw-bold mb-3">Jelajahi Cita Rasa Nusantara</h1>
+            <p className="lead mb-4 opacity-75">
+                Koleksi resep masakan tradisional Indonesia lengkap dengan informasi nilai gizi akurat.
+            </p>
+            
+            {/* Search Bar */}
+            <Row className="justify-content-center">
+                <Col md={6}>
+                    <InputGroup className="mb-3">
+                        <Form.Control
+                            placeholder="Cari resep (misal: Soto, Rendang)..."
+                            className="search-input text-dark"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </InputGroup>
+                </Col>
+            </Row>
+        </Container>
+      </div>
 
-      {/* --- Content Utama --- */}
-      <Container>
-        <div className="text-center mb-5">
-          <h1 className="fw-bold text-dark">Galeri Resep Nusantara</h1>
-          <p className="text-muted">Integrasi React Frontend + Node.js Backend</p>
-        </div>
-
-        {/* Loading State */}
-        {loading ? (
+      {/* --- CONTENT UTAMA --- */}
+      <Container className="mb-5" style={{ minHeight: '50vh' }}>
+        
+        {/* State: Loading */}
+        {loading && (
           <div className="text-center py-5">
-            <Spinner animation="border" variant="success" />
-            <p className="mt-2">Sedang mengambil data dari dapur...</p>
+            <Spinner animation="grow" variant="success" />
+            <p className="mt-3 text-muted">Sedang menyiapkan bahan-bahan...</p>
           </div>
-        ) : (
-          /* Grid Resep */
-          <Row xs={1} md={3} className="g-4">
-            {recipes.map((recipe) => (
-              <Col key={recipe.id}>
-                <Card className="h-100 shadow-sm border-0 hover-effect">
-                  <Card.Img 
-                    variant="top" 
-                    src={recipe.image_url} 
-                    style={{ height: '200px', objectFit: 'cover' }} 
-                  />
-                  <Card.Body>
-                    <Card.Title className="fw-bold">{recipe.title}</Card.Title>
-                    <Card.Text className="text-truncate text-muted">
-                      {recipe.description}
-                    </Card.Text>
-                    <Button 
-                      variant="outline-success" 
-                      className="w-100 mt-2"
-                      onClick={() => handleShowDetail(recipe.id)}
-                    >
-                      Lihat Detail & Nutrisi
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
         )}
+
+        {/* State: Error */}
+        {error && (
+            <div className="alert alert-danger text-center shadow-sm border-0">
+                <strong>Terjadi Kesalahan:</strong> {error}
+            </div>
+        )}
+
+        {/* State: Data Kosong (Hasil Search Nihil) */}
+        {!loading && !error && filteredRecipes.length === 0 && (
+            <div className="text-center py-5">
+                <h3>🍲</h3>
+                <h5 className="text-muted">Resep tidak ditemukan</h5>
+                <p>Coba kata kunci lain.</p>
+            </div>
+        )}
+
+        {/* GRID RESEP */}
+        <Row xs={1} md={2} lg={3} className="g-4">
+          {filteredRecipes.map((recipe) => (
+            <Col key={recipe.id}>
+              <Card className="h-100 shadow-sm hover-card bg-white">
+                <div style={{ overflow: 'hidden', height: '220px' }}>
+                    <Card.Img 
+                      variant="top" 
+                      src={recipe.image_url} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                </div>
+                <Card.Body className="d-flex flex-column">
+                  <div className="mb-2">
+                    <Badge bg="success" className="me-2">Resep Asli</Badge>
+                    <Badge bg="light" text="dark" className="border">
+                        {recipe.total_calories ? `± ${recipe.total_calories} kkal` : 'Info Gizi Tersedia'}
+                    </Badge>
+                  </div>
+                  <Card.Title className="fw-bold text-dark">{recipe.title}</Card.Title>
+                  <Card.Text className="text-secondary small flex-grow-1">
+                    {recipe.description.length > 80 
+                        ? recipe.description.substring(0, 80) + '...' 
+                        : recipe.description}
+                  </Card.Text>
+                  <Button 
+                    variant="outline-success" 
+                    className="w-100 mt-3 rounded-pill fw-bold"
+                    onClick={() => handleShowDetail(recipe.id)}
+                  >
+                    Lihat Resep & Nutrisi
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </Container>
 
-      {/* --- Modal Detail Resep --- */}
-      <Modal show={showModal} onHide={handleClose} size="lg" centered>
+      {/* --- FOOTER SIMPLE --- */}
+      <footer className="bg-light text-center py-4 mt-auto border-top">
+        <Container>
+            <p className="text-muted small mb-0">
+                &copy; 2024 NusaNutrisi API. Dibuat untuk melestarikan kuliner Indonesia.
+            </p>
+        </Container>
+      </footer>
+
+      {/* --- MODAL DETAIL (Sama seperti sebelumnya tapi dirapikan) --- */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
         {selectedRecipe && (
           <>
-            <Modal.Header closeButton className="bg-success text-white">
-              <Modal.Title>{selectedRecipe.title}</Modal.Title>
+            <Modal.Header closeButton className="border-0">
+              <Modal.Title className="fw-bold text-success">{selectedRecipe.title}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="px-4 pb-4">
               <Row>
-                {/* Kolom Kiri: Gambar & Instruksi */}
-                <Col md={6}>
+                <Col md={6} className="mb-3">
                   <img 
                     src={selectedRecipe.image_url} 
-                    className="img-fluid rounded mb-3 w-100" 
+                    className="img-fluid rounded-4 shadow-sm mb-3 w-100" 
                     alt={selectedRecipe.title} 
                   />
                   <h6 className="fw-bold">Cara Memasak:</h6>
-                  <p style={{ whiteSpace: 'pre-line', fontSize: '0.9rem' }}>
-                    {selectedRecipe.instructions}
-                  </p>
+                  <div className="p-3 bg-light rounded-3 border">
+                    <p style={{ whiteSpace: 'pre-line', fontSize: '0.9rem', marginBottom: 0 }}>
+                        {selectedRecipe.instructions}
+                    </p>
+                  </div>
                 </Col>
 
-                {/* Kolom Kanan: Nutrisi & Bahan */}
                 <Col md={6}>
-                  {/* Card Nutrisi */}
-                  <Card className="bg-light mb-3 border-success">
+                  {/* Card Nutrisi Highlight */}
+                  <Card className="border-success mb-3 bg-success bg-opacity-10">
                     <Card.Body>
-                      <h6 className="fw-bold text-success">Total Nutrisi (Per Porsi)</h6>
-                      <hr />
-                      <div className="d-flex justify-content-between mb-1">
-                        <span>🔥 Kalori</span>
-                        <strong className="text-dark">{selectedRecipe.total_nutrition_per_serving.calories} kkal</strong>
+                      <h6 className="fw-bold text-success mb-3">Informasi Nilai Gizi (Per Porsi)</h6>
+                      <div className="d-flex justify-content-between mb-2 border-bottom border-success border-opacity-25 pb-1">
+                        <span>🔥 Kalori Total</span>
+                        <strong className="text-success">{selectedRecipe.total_nutrition_per_serving.calories} kkal</strong>
                       </div>
-                      <div className="d-flex justify-content-between mb-1">
-                        <span>🥩 Protein</span>
-                        <strong>{selectedRecipe.total_nutrition_per_serving.protein} g</strong>
-                      </div>
-                      <div className="d-flex justify-content-between mb-1">
-                        <span>🍚 Karbo</span>
-                        <strong>{selectedRecipe.total_nutrition_per_serving.carbs} g</strong>
-                      </div>
-                      <div className="d-flex justify-content-between">
-                        <span>🥑 Lemak</span>
-                        <strong>{selectedRecipe.total_nutrition_per_serving.fats} g</strong>
+                      <div className="row text-center mt-3">
+                          <div className="col-4">
+                              <small className="d-block text-muted">Protein</small>
+                              <strong>{selectedRecipe.total_nutrition_per_serving.protein}g</strong>
+                          </div>
+                          <div className="col-4 border-start border-end border-success border-opacity-25">
+                              <small className="d-block text-muted">Karbo</small>
+                              <strong>{selectedRecipe.total_nutrition_per_serving.carbs}g</strong>
+                          </div>
+                          <div className="col-4">
+                              <small className="d-block text-muted">Lemak</small>
+                              <strong>{selectedRecipe.total_nutrition_per_serving.fats}g</strong>
+                          </div>
                       </div>
                     </Card.Body>
                   </Card>
 
-                  {/* List Bahan */}
-                  <h6 className="fw-bold">Rincian Bahan:</h6>
+                  <h6 className="fw-bold mt-4">Bahan-bahan:</h6>
                   <ListGroup variant="flush" className="small">
                     {selectedRecipe.ingredients.map((item, idx) => (
-                      <ListGroup.Item key={idx} className="d-flex justify-content-between align-items-center px-0">
+                      <ListGroup.Item key={idx} className="d-flex justify-content-between align-items-center px-0 border-bottom">
                         <div>
+                          <i className="bi bi-circle-fill text-success me-2" style={{fontSize: '5px'}}></i>
                           <strong>{item.ingredient_name}</strong>
-                          <div className="text-muted" style={{fontSize: '0.8em'}}>
-                             {item.notes} ({item.quantity})
+                          <span className="text-muted ms-1">({item.quantity})</span>
+                          <div className="text-muted fst-italic ms-3" style={{fontSize: '0.85em'}}>
+                             {item.notes}
                           </div>
                         </div>
-                        <Badge bg="secondary" pill>
-                          {item.nutrition_contribution.calories} kkal
-                        </Badge>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
                 </Col>
               </Row>
             </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
+            <Modal.Footer className="border-0">
+              <Button variant="secondary" onClick={() => setShowModal(false)} className="rounded-pill px-4">
                 Tutup
               </Button>
             </Modal.Footer>
           </>
         )}
       </Modal>
-    </div>
+    </>
   );
 }
 

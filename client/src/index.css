@@ -1,0 +1,26 @@
+/* Tambahan Custom UI */
+.hero-section {
+  background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+  color: white;
+  padding: 80px 0;
+  margin-bottom: 40px;
+  border-radius: 0 0 50px 50px; /* Lengkungan modern di bawah */
+}
+
+.hover-card {
+  transition: all 0.3s ease;
+  border: none;
+  overflow: hidden;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px); /* Kartu naik sedikit */
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+
+.search-input {
+  border-radius: 50px;
+  padding: 15px 25px;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}

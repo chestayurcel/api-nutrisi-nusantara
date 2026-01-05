@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Container, Card, Form, Button, Alert, Row, Col, Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import { Container, Card, Form, Button, Alert, Row, Col, Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:3000/api/v1';
@@ -73,7 +73,7 @@ function Dashboard() {
                         
                         {/* HEADER */}
                         <div className="text-center mb-4">
-                            <h2 className="fw-bold">Developer Console</h2>
+                            <h2 className="fw-bold text-white">Developer Console</h2>
                             <p className="text-secondary small">Manage your API Keys and usage.</p>
                         </div>
 
@@ -85,7 +85,7 @@ function Dashboard() {
                                         <span className="display-4">👋</span>
                                     </div>
                                     <h4 className="text-success fw-bold">Welcome, {userData.name}</h4>
-                                    <p className="text-secondary small">API Key Aktif Anda:</p>
+                                    <p className="text-light small">API Key Aktif Anda:</p>
                                     
                                     <div className="bg-dark p-3 rounded border border-secondary d-flex justify-content-between align-items-center my-3">
                                         <code className="text-warning user-select-all">{userData.api_key}</code>
@@ -97,13 +97,13 @@ function Dashboard() {
                                     <div className="row g-2 mt-4">
                                         <div className="col-6">
                                             <div className="p-2 border border-secondary rounded bg-dark">
-                                                <small className="text-muted d-block">Quota</small>
+                                                <small className="text-light d-block">Quota</small>
                                                 <strong>{userData.quota}</strong>
                                             </div>
                                         </div>
                                         <div className="col-6">
                                             <div className="p-2 border border-secondary rounded bg-dark">
-                                                <small className="text-muted d-block">Status</small>
+                                                <small className="text-light d-block">Status</small>
                                                 <strong className="text-success">Active</strong>
                                             </div>
                                         </div>
@@ -114,15 +114,15 @@ function Dashboard() {
                         ) : (
                             /* KONDISI 2: BELUM LOGIN (FORM) */
                             <Card className="bg-black text-light border-secondary shadow">
-                                <Card.Header className="bg-transparent border-secondary d-flex justify-content-center p-0">
+                                <Card.Header className="bg-dark border-secondary d-flex justify-content-center p-0">
                                     <button 
-                                        className={`btn flex-fill rounded-0 py-3 ${!isLoginMode ? 'btn-success fw-bold' : 'text-secondary'}`}
+                                        className={`btn flex-fill rounded-0 py-3 ${!isLoginMode ? 'btn-success fw-bold' : 'text-secondary btn-dark'}`}
                                         onClick={() => { setIsLoginMode(false); setError(null); }}
                                     >
                                         Register
                                     </button>
                                     <button 
-                                        className={`btn flex-fill rounded-0 py-3 ${isLoginMode ? 'btn-success fw-bold' : 'text-secondary'}`}
+                                        className={`btn flex-fill rounded-0 py-3 ${isLoginMode ? 'btn-success fw-bold' : 'text-secondary btn-dark'}`}
                                         onClick={() => { setIsLoginMode(true); setError(null); }}
                                     >
                                         Login
@@ -136,10 +136,12 @@ function Dashboard() {
                                         {/* Input Nama hanya muncul saat Register */}
                                         {!isLoginMode && (
                                             <Form.Group className="mb-3">
-                                                <Form.Label className="small text-muted">Full Name</Form.Label>
+                                                {/* PERBAIKAN: Ganti text-muted jadi text-light */}
+                                                <Form.Label className="fw-bold text-light">Full Name</Form.Label>
                                                 <Form.Control 
                                                     type="text" 
                                                     className="bg-dark text-light border-secondary"
+                                                    style={{color: 'white'}}
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
                                                     required
@@ -148,10 +150,12 @@ function Dashboard() {
                                         )}
 
                                         <Form.Group className="mb-3">
-                                            <Form.Label className="small text-muted">Email Address</Form.Label>
+                                            {/* PERBAIKAN: Ganti text-muted jadi text-light */}
+                                            <Form.Label className="fw-bold text-light">Email Address</Form.Label>
                                             <Form.Control 
                                                 type="email" 
                                                 className="bg-dark text-light border-secondary"
+                                                style={{color: 'white'}}
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 required
@@ -159,10 +163,12 @@ function Dashboard() {
                                         </Form.Group>
 
                                         <Form.Group className="mb-4">
-                                            <Form.Label className="small text-muted">Password</Form.Label>
+                                            {/* PERBAIKAN: Ganti text-muted jadi text-light */}
+                                            <Form.Label className="fw-bold text-light">Password</Form.Label>
                                             <Form.Control 
                                                 type="password" 
                                                 className="bg-dark text-light border-secondary"
+                                                style={{color: 'white'}}
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 required
@@ -172,7 +178,7 @@ function Dashboard() {
                                         <Button 
                                             variant="light" 
                                             type="submit" 
-                                            className="w-100 fw-bold"
+                                            className="w-100 fw-bold py-2"
                                             disabled={loading}
                                         >
                                             {loading ? 'Processing...' : (isLoginMode ? 'Access Console' : 'Create Account')}
