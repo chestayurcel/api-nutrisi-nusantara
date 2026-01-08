@@ -73,4 +73,46 @@ const loginDeveloper = async (req, res) => {
     }
 };
 
-module.exports = { registerDeveloper, loginDeveloper };
+// --- REGENERATE KEY (RESET QUOTA) ---
+const regenerateApiKey = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Cari user
+        const [users] = await db.query('SELECT * FROM developers WHERE email = ?', [email]);
+        if (users.length === 0) {
+            return res.status(401).json({ status: 'fail', message: 'User tidak ditemukan' });
+        }
+        const developer = users[0];
+
+        // 2. Verifikasi Password
+        const isMatch = await bcrypt.compare(password, developer.password);
+        if (!isMatch) {
+            return res.status(401).json({ status: 'fail', message: 'Password salah' });
+        }
+
+        // 3. Generate Key Baru
+        const newApiKey = 'sk-nusa-' + crypto.randomBytes(16).toString('hex');
+
+        // 4. Update di Database (Key Baru & Reset Quota 1000)
+        await db.query(
+            'UPDATE developers SET api_key = ?, request_quota = 1000 WHERE id = ?', 
+            [newApiKey, developer.id]
+        );
+
+        res.status(200).json({
+            status: 'success',
+            message: 'API Key berhasil diperbarui',
+            data: {
+                name: developer.name,
+                api_key: newApiKey,
+                quota: 1000
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
+module.exports = { registerDeveloper, loginDeveloper, regenerateApiKey };
