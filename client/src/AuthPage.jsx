@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Container, Card, Form, Button, Alert, Navbar } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import Navigation from './components/Navigation';
 
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 
@@ -41,15 +42,9 @@ function AuthPage() {
 
     return (
         <div className="bg-soft min-vh-100 d-flex flex-column">
-            <Navbar className="bg-white py-3 shadow-sm mb-5">
-                <Container>
-                    <Navbar.Brand as={Link} to="/" className="fw-bold text-emerald">
-                        &larr; Kembali ke Depan
-                    </Navbar.Brand>
-                </Container>
-            </Navbar>
+            <Navigation />
 
-            <Container>
+            <Container className="py-5 mt-5">
                 <div className="row justify-content-center">
                     <div className="col-md-5">
                         <Card className="card-luxury p-4">

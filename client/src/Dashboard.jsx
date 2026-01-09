@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Card, Button, Row, Col, Navbar, Nav, Form, Alert, Spinner } from 'react-bootstrap';
+import { Container, Card, Button, Row, Col, Form, Alert, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import Navigation from './components/Navigation';
 
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 
@@ -70,22 +71,10 @@ function Dashboard() {
     return (
         <div className="bg-soft min-vh-100 font-sans">
             
-            {/* --- NAVBAR --- */}
-            <Navbar className="nav-luxury sticky-top py-3 mb-5 border-bottom">
-                <Container>
-                    <Navbar.Brand as={Link} to="/gallery" className="fw-bold text-emerald">
-                        &larr; Kembali ke Galeri
-                    </Navbar.Brand>
-                    <Nav className="ms-auto align-items-center">
-                        <Button variant="link" className="text-danger text-decoration-none small fw-bold" onClick={handleLogout}>
-                            Logout
-                        </Button>
-                    </Nav>
-                </Container>
-            </Navbar>
+            <Navigation />
 
             {/* --- KONTEN DASHBOARD --- */}
-            <Container>
+            <Container className="py-5 mt-3">
                 <Row className="justify-content-center">
                     <Col md={8} lg={6}>
                         

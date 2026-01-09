@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Card, Button, Modal, Spinner, Navbar, Nav, Form, InputGroup, Badge, ListGroup } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Card, Button, Modal, Spinner, Form, InputGroup, Badge, ListGroup } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import Navigation from './components/Navigation';
 
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 
@@ -50,13 +51,6 @@ function Gallery() {
     }
   };
 
-  const handleLogout = () => {
-    if(window.confirm('Yakin ingin keluar?')) {
-        localStorage.removeItem('user_data');
-        navigate('/');
-    }
-  };
-
   // Logic Modal Detail
   const handleShowDetail = async (id) => {
     try {
@@ -79,28 +73,10 @@ function Gallery() {
   return (
     <div className="bg-soft min-vh-100 font-sans">
       
-      {/* --- NAVBAR PREMIUM --- */}
-      <Navbar className="nav-luxury sticky-top py-3 mb-5 border-bottom">
-        <Container>
-            <Navbar.Brand className="fw-bold text-emerald fs-4">
-                🥗 NusaNutrisi <span className="text-muted fs-6 fw-normal">| Premium Gallery</span>
-            </Navbar.Brand>
-            <Nav className="ms-auto align-items-center gap-3">
-                <span className="text-secondary d-none d-md-block small">
-                    Halo, <strong>{user?.name}</strong>
-                </span>
-                <Link to="/console" className="btn btn-outline-success rounded-pill btn-sm px-3">
-                    Developer Console
-                </Link>
-                <Button variant="link" className="text-danger text-decoration-none fw-bold small" onClick={handleLogout}>
-                    Logout
-                </Button>
-            </Nav>
-        </Container>
-      </Navbar>
+      <Navigation />
 
       {/* --- KONTEN UTAMA --- */}
-      <Container>
+      <Container className="py-5 mt-3">
         
         {/* Header Section */}
         <div className="text-center mb-5">
