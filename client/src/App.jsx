@@ -1,45 +1,33 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Container, Navbar, Nav, Button } from 'react-bootstrap';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './LandingPage';
+import AuthPage from './AuthPage';
 import Gallery from './Gallery';
 import Dashboard from './Dashboard';
+
+// Helper: Cek apakah user sudah login (ada data di localStorage)
+const PrivateRoute = ({ children }) => {
+  const user = JSON.parse(localStorage.getItem('user_data'));
+  return user ? children : <Navigate to="/auth" />;
+};
 
 function App() {
   return (
     <Router>
        <Routes>
-          {/* Halaman Utama (Home) */}
-          <Route path="/" element={<HomeLayout />} />
-          
-          {/* Halaman Developer (Dashboard) */}
-          <Route path="/developer" element={<Dashboard />} />
+          {/* Halaman Publik */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+
+          {/* Halaman Private (Harus Login) */}
+          <Route path="/gallery" element={
+            <PrivateRoute><Gallery /></PrivateRoute>
+          } />
+          <Route path="/console" element={
+            <PrivateRoute><Dashboard /></PrivateRoute>
+          } />
        </Routes>
     </Router>
   );
-}
-
-// Layout Halaman Utama (Wrapper)
-function HomeLayout() {
-    return (
-        <div className="bg-light min-vh-100">
-             <Navbar bg="white" expand="lg" className="shadow-sm sticky-top">
-                <Container>
-                    <Navbar.Brand as={Link} to="/" className="fw-bold text-success">
-                        🥗 NusaNutrisi
-                    </Navbar.Brand>
-                    <Nav className="ms-auto">
-                        <Nav.Link as={Link} to="/" className="me-3">Galeri Resep</Nav.Link>
-                        {/* Tombol Menuju Dashboard ala OpenRouter */}
-                        <Button as={Link} to="/developer" variant="dark" className="px-4 rounded-pill">
-                            For Developers
-                        </Button>
-                    </Nav>
-                </Container>
-            </Navbar>
-            
-            {/* Panggil Komponen Galeri di sini */}
-            <Gallery /> 
-        </div>
-    );
 }
 
 export default App;
