@@ -81,7 +81,7 @@ function LandingPage() {
             </div>
             
             <footer className="text-center py-4 text-muted small">
-                © 2024 NusaNutrisi Inc. All rights reserved.
+                © 2026 NusaNutrisi Inc. All rights reserved.
             </footer>
         </div>
     );
