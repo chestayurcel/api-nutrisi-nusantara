@@ -1,223 +1,227 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Card, Form, Button, Alert, Row, Col, Navbar, Nav } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Container, Card, Button, Row, Col, Navbar, Nav, Form, Alert, Spinner } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 
 function Dashboard() {
-    // State Mode
-    const [isLoginMode, setIsLoginMode] = useState(false); 
+    const navigate = useNavigate();
 
-    // Form State
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    // 1. Ambil data user dari LocalStorage
+    // (Data ini tersimpan saat login di AuthPage)
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user_data')));
     
-    // Result State
-    const [userData, setUserData] = useState(null); 
-    const [error, setError] = useState(null);
+    // State untuk fitur Regenerate Key
+    const [showRegenerateForm, setShowRegenerateForm] = useState(false);
+    const [regenEmail, setRegenEmail] = useState('');
+    const [regenPassword, setRegenPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState(null); // Untuk notifikasi sukses/gagal
 
-    // --- HANDLE LOGIN / REGISTER ---
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-
-        try {
-            const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
-            const payload = isLoginMode 
-                ? { email, password } 
-                : { name, email, password };
-
-            const res = await axios.post(`${API_BASE_URL}${endpoint}`, payload);
-            
-            setUserData(res.data.data);
-            setName(res.data.data.name);
-            
-        } catch (err) {
-            setError(err.response?.data?.message || 'Terjadi kesalahan sistem');
-        } finally {
-            setLoading(false);
+    // 2. Cek apakah user sudah login
+    useEffect(() => {
+        if (!user) {
+            navigate('/auth');
         }
-    };
-
-    // --- HANDLE REGENERATE KEY (BARU) ---
-    const handleRegenerate = async () => {
-        if(!window.confirm("Apakah Anda yakin? API Key lama akan hangus dan kuota akan direset ke 1000.")) return;
-
-        setLoading(true);
-        try {
-            // Menggunakan email & password yang masih tersimpan di state form
-            const res = await axios.post(`${API_BASE_URL}/auth/regenerate`, { email, password });
-            
-            // Update tampilan dengan data baru
-            setUserData(res.data.data);
-            alert("Berhasil! API Key baru telah dibuat.");
-        } catch (err) {
-            alert("Gagal reset key: " + (err.response?.data?.message || "Server Error"));
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [user, navigate]);
 
     const handleLogout = () => {
-        setUserData(null);
-        setEmail('');
-        setPassword('');
-        setName('');
+        if (window.confirm('Keluar dari Developer Console?')) {
+            localStorage.removeItem('user_data');
+            navigate('/');
+        }
     };
 
+    // 3. Fungsi Reset API Key (Panggil Endpoint /regenerate)
+    const handleRegenerate = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage(null);
+
+        try {
+            const res = await axios.post(`${API_BASE_URL}/auth/regenerate`, {
+                email: regenEmail,
+                password: regenPassword
+            });
+
+            // Jika sukses:
+            // 1. Update data user di State & LocalStorage dengan data baru (Key baru)
+            const newUser = { ...user, api_key: res.data.data.api_key, quota: 1000 };
+            setUser(newUser);
+            localStorage.setItem('user_data', JSON.stringify(newUser));
+
+            // 2. Reset Form
+            setMessage({ type: 'success', text: 'Berhasil! API Key baru telah aktif.' });
+            setShowRegenerateForm(false);
+            setRegenEmail('');
+            setRegenPassword('');
+
+        } catch (err) {
+            setMessage({ type: 'danger', text: err.response?.data?.message || 'Gagal mereset key.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Jika user null (sedang redirect), jangan tampilkan apa-apa
+    if (!user) return null;
+
     return (
-        <div className="bg-dark min-vh-100 text-light font-monospace">
-            {/* Navbar */}
-            <Navbar bg="black" variant="dark" className="border-bottom border-secondary px-3">
-                <Navbar.Brand as={Link} to="/" className="fw-bold text-success">
-                    &larr; NusaNutrisi
-                </Navbar.Brand>
-                <Nav className="ms-auto">
-                    <Nav.Link href="http://localhost:3000/api-docs" target="_blank">Docs</Nav.Link>
-                    {userData && (
-                        <Button variant="outline-danger" size="sm" onClick={handleLogout} className="ms-3">
+        <div className="bg-soft min-vh-100 font-sans">
+            
+            {/* --- NAVBAR --- */}
+            <Navbar className="nav-luxury sticky-top py-3 mb-5 border-bottom">
+                <Container>
+                    <Navbar.Brand as={Link} to="/gallery" className="fw-bold text-emerald">
+                        &larr; Kembali ke Galeri
+                    </Navbar.Brand>
+                    <Nav className="ms-auto align-items-center">
+                        <Button variant="link" className="text-danger text-decoration-none small fw-bold" onClick={handleLogout}>
                             Logout
                         </Button>
-                    )}
-                </Nav>
+                    </Nav>
+                </Container>
             </Navbar>
 
-            <Container className="py-5">
+            {/* --- KONTEN DASHBOARD --- */}
+            <Container>
                 <Row className="justify-content-center">
-                    <Col md={6} lg={5}>
+                    <Col md={8} lg={6}>
                         
-                        <div className="text-center mb-4">
-                            <h2 className="fw-bold text-white">Developer Console</h2>
-                            <p className="text-secondary small">Manage your API Keys and usage.</p>
+                        {/* Header Profile */}
+                        <div className="text-center mb-5">
+                            <div className="bg-emerald text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style={{width:'80px', height:'80px', fontSize:'2rem'}}>
+                                {user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <h2 className="fw-bold text-dark">Developer Console</h2>
+                            <p className="text-muted">Kelola akses API dan pantau penggunaan kuota Anda.</p>
                         </div>
 
-                        {/* KONDISI 1: SUDAH LOGIN */}
-                        {userData ? (
-                            <Card className="bg-black text-light border-success shadow-lg">
-                                <Card.Body className="p-4 text-center">
-                                    <div className="mb-3">
-                                        <span className="display-4">👋</span>
-                                    </div>
-                                    <h4 className="text-success fw-bold">Welcome, {userData.name}</h4>
-                                    <p className="text-light small">API Key Aktif Anda:</p>
-                                    
-                                    <div className="bg-dark p-3 rounded border border-secondary d-flex justify-content-between align-items-center my-3">
-                                        <code className="text-warning user-select-all">{userData.api_key}</code>
-                                        <Button size="sm" variant="outline-light" onClick={() => navigator.clipboard.writeText(userData.api_key)}>
-                                            Copy
-                                        </Button>
-                                    </div>
+                        {/* Pesan Notifikasi (Jika ada) */}
+                        {message && (
+                            <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+                                {message.text}
+                            </Alert>
+                        )}
 
-                                    <div className="row g-2 mt-4">
-                                        <div className="col-6">
-                                            <div className="p-2 border border-secondary rounded bg-dark">
-                                                <small className="text-light d-block">Quota</small>
-                                                <strong>{userData.quota}</strong>
-                                            </div>
-                                        </div>
-                                        <div className="col-6">
-                                            <div className="p-2 border border-secondary rounded bg-dark">
-                                                <small className="text-light d-block">Status</small>
-                                                <strong className="text-success">Active</strong>
-                                            </div>
-                                        </div>
-                                    </div>
+                        {/* KARTU API KEY UTAMA */}
+                        <Card className="card-luxury mb-4 border-0">
+                            <Card.Body className="p-4">
+                                <h5 className="fw-bold text-emerald mb-3">🔑 API Key Aktif</h5>
+                                <div className="p-3 bg-light rounded border border-secondary border-opacity-25 d-flex align-items-center justify-content-between">
+                                    <code className="text-dark fs-6 user-select-all text-break me-2">
+                                        {user.api_key}
+                                    </code>
+                                    <Button 
+                                        size="sm" 
+                                        variant="outline-success" 
+                                        className="rounded-pill px-3"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(user.api_key);
+                                            alert('API Key disalin!');
+                                        }}
+                                    >
+                                        Copy
+                                    </Button>
+                                </div>
+                                <div className="mt-3 text-muted small">
+                                    <i className="bi bi-info-circle me-1"></i>
+                                    Gunakan key ini pada header <code>x-api-key</code> di setiap request.
+                                </div>
+                            </Card.Body>
+                        </Card>
 
-                                    {/* TOMBOL REGENERATE BARU */}
-                                    <div className="mt-4 pt-3 border-top border-secondary">
+                        {/* STATUS KUOTA */}
+                        <Row className="g-4 mb-4">
+                            <Col xs={6}>
+                                <Card className="card-luxury h-100 border-0 text-center py-3">
+                                    <Card.Body>
+                                        <small className="text-muted text-uppercase ls-1">Sisa Kuota</small>
+                                        <h2 className={`fw-bold mt-2 ${user.quota < 100 ? 'text-danger' : 'text-dark'}`}>
+                                            {user.quota}
+                                        </h2>
+                                        <small className="text-muted">Request / hari</small>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                            <Col xs={6}>
+                                <Card className="card-luxury h-100 border-0 text-center py-3">
+                                    <Card.Body>
+                                        <small className="text-muted text-uppercase ls-1">Status Akun</small>
+                                        <h2 className="fw-bold text-success mt-2">Active</h2>
+                                        <small className="text-muted">Free Tier</small>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
+
+                        {/* DANGER ZONE (RESET KEY) */}
+                        <Card className="border border-danger border-opacity-25 bg-white shadow-sm">
+                            <Card.Body className="p-4">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 className="fw-bold text-danger mb-1">Reset API Key & Kuota</h6>
+                                        <p className="text-muted small mb-0">Jika kuota habis atau key bocor.</p>
+                                    </div>
+                                    {!showRegenerateForm && (
                                         <Button 
-                                            variant="outline-warning" 
+                                            variant="outline-danger" 
                                             size="sm" 
-                                            className="w-100"
-                                            onClick={handleRegenerate}
-                                            disabled={loading}
+                                            className="rounded-pill"
+                                            onClick={() => setShowRegenerateForm(true)}
                                         >
-                                            {loading ? 'Processing...' : '🔄 Generate New Key (Reset Quota)'}
+                                            Reset Sekarang
                                         </Button>
-                                        <p className="text-secondary mt-2" style={{fontSize: '0.7rem'}}>
-                                            *Key lama akan hangus. Quota kembali ke 1000.
+                                    )}
+                                </div>
+
+                                {/* Form Konfirmasi Reset */}
+                                {showRegenerateForm && (
+                                    <div className="mt-4 pt-3 border-top">
+                                        <p className="small text-muted mb-3">
+                                            Masukkan kredensial Anda untuk konfirmasi. 
+                                            <strong className="text-danger"> Key lama akan hangus.</strong>
                                         </p>
-                                    </div>
-
-                                </Card.Body>
-                            </Card>
-
-                        ) : (
-                            /* KONDISI 2: BELUM LOGIN */
-                            <Card className="bg-black text-light border-secondary shadow">
-                                <Card.Header className="bg-dark border-secondary d-flex justify-content-center p-0">
-                                    <button 
-                                        className={`btn flex-fill rounded-0 py-3 ${!isLoginMode ? 'btn-success fw-bold' : 'text-secondary btn-dark'}`}
-                                        onClick={() => { setIsLoginMode(false); setError(null); }}
-                                    >
-                                        Register
-                                    </button>
-                                    <button 
-                                        className={`btn flex-fill rounded-0 py-3 ${isLoginMode ? 'btn-success fw-bold' : 'text-secondary btn-dark'}`}
-                                        onClick={() => { setIsLoginMode(true); setError(null); }}
-                                    >
-                                        Login
-                                    </button>
-                                </Card.Header>
-
-                                <Card.Body className="p-4">
-                                    {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
-                                    
-                                    <Form onSubmit={handleSubmit}>
-                                        {!isLoginMode && (
-                                            <Form.Group className="mb-3">
-                                                <Form.Label className="fw-bold text-light">Full Name</Form.Label>
+                                        <Form onSubmit={handleRegenerate}>
+                                            <Form.Group className="mb-2">
                                                 <Form.Control 
-                                                    type="text" 
-                                                    className="bg-dark text-light border-secondary"
-                                                    style={{color: 'white'}}
-                                                    value={name}
-                                                    onChange={(e) => setName(e.target.value)}
+                                                    type="email" 
+                                                    placeholder="Email terdaftar" 
+                                                    className="bg-light"
+                                                    value={regenEmail}
+                                                    onChange={e => setRegenEmail(e.target.value)}
                                                     required
                                                 />
                                             </Form.Group>
-                                        )}
+                                            <Form.Group className="mb-3">
+                                                <Form.Control 
+                                                    type="password" 
+                                                    placeholder="Password" 
+                                                    className="bg-light"
+                                                    value={regenPassword}
+                                                    onChange={e => setRegenPassword(e.target.value)}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                            <div className="d-flex gap-2">
+                                                <Button type="submit" variant="danger" size="sm" className="px-4" disabled={loading}>
+                                                    {loading ? <Spinner animation="border" size="sm"/> : 'Konfirmasi Reset'}
+                                                </Button>
+                                                <Button 
+                                                    variant="secondary" 
+                                                    size="sm" 
+                                                    onClick={() => setShowRegenerateForm(false)}
+                                                >
+                                                    Batal
+                                                </Button>
+                                            </div>
+                                        </Form>
+                                    </div>
+                                )}
+                            </Card.Body>
+                        </Card>
 
-                                        <Form.Group className="mb-3">
-                                            <Form.Label className="fw-bold text-light">Email Address</Form.Label>
-                                            <Form.Control 
-                                                type="email" 
-                                                className="bg-dark text-light border-secondary"
-                                                style={{color: 'white'}}
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                required
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group className="mb-4">
-                                            <Form.Label className="fw-bold text-light">Password</Form.Label>
-                                            <Form.Control 
-                                                type="password" 
-                                                className="bg-dark text-light border-secondary"
-                                                style={{color: 'white'}}
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                required
-                                            />
-                                        </Form.Group>
-
-                                        <Button 
-                                            variant="light" 
-                                            type="submit" 
-                                            className="w-100 fw-bold py-2"
-                                            disabled={loading}
-                                        >
-                                            {loading ? 'Processing...' : (isLoginMode ? 'Access Console' : 'Create Account')}
-                                        </Button>
-                                    </Form>
-                                </Card.Body>
-                            </Card>
-                        )}
                     </Col>
                 </Row>
             </Container>
