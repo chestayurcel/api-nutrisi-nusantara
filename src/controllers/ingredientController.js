@@ -1,41 +1,39 @@
-const ingredientService = require('../services/ingredientService');
+const db = require('../config/database');
 
 const index = async (req, res) => {
     try {
-        const result = await ingredientService.getIngredients(req.query);
+        // Langsung ambil dari database, urutkan A-Z
+        const [rows] = await db.query('SELECT * FROM ingredients ORDER BY name ASC');
         
         res.status(200).json({
             status: 'success',
             message: 'Data retrieved successfully',
-            data: result.data,
-            meta: result.meta
+            data: rows,
+            meta: {
+                total: rows.length
+            }
         });
     } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: error.message
-        });
+        res.status(500).json({ status: 'error', message: error.message });
     }
 };
 
 const show = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await ingredientService.getIngredientDetail(id);
+        const [rows] = await db.query('SELECT * FROM ingredients WHERE id = ?', [id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ status: 'fail', message: 'Bahan tidak ditemukan' });
+        }
         
         res.status(200).json({
             status: 'success',
-            data: result
+            data: rows[0]
         });
     } catch (error) {
-        if (error.message === 'Ingredient not found') {
-            return res.status(404).json({ status: 'fail', message: 'Bahan tidak ditemukan' });
-        }
         res.status(500).json({ status: 'error', message: error.message });
     }
 };
 
-module.exports = {
-    index,
-    show
-};
+module.exports = { index, show };

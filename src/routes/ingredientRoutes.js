@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ingredientController = require('../controllers/ingredientController');
+const apiKeyMiddleware = require('../middleware/apiKeyMiddleware');
+
+router.use(apiKeyMiddleware);
 
 // GET /api/v1/ingredients
 router.get('/', ingredientController.index);
