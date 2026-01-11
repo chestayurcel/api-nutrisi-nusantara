@@ -23,12 +23,10 @@ function LandingPage() {
                         </p>
                         
                         <div className="d-flex flex-wrap gap-3">
-                            {/* TOMBOL UTAMA: Ke Register */}
                             <Link to="/auth" className="btn btn-luxury btn-lg shadow px-5">
                                 Coba Gratis
                             </Link>
                             
-                            {/* TOMBOL SEKUNDER: Ke Dokumentasi (Tab Baru) */}
                             <a href="http://localhost:3000/api-docs" target="_blank" rel="noreferrer" className="btn btn-outline-success btn-lg rounded-pill px-4">
                                 Baca Dokumentasi ↗
                             </a>
@@ -41,11 +39,6 @@ function LandingPage() {
                     </Col>
                     
                     <Col md={6} className="text-center position-relative">
-                        {/* Background Shape Hijau (Hiasan) */}
-                        <div className="bg-emerald rounded-circle position-absolute top-50 start-50 translate-middle opacity-10 d-none d-md-block" 
-                            style={{width: '450px', height: '450px', zIndex: 0}}>
-                        </div>
-
                         {/* Komponen Kalkulator Demo */}
                         <div className="p-md-4 position-relative" style={{zIndex: 2}}>
                             <CalculatorDemo />
@@ -90,7 +83,6 @@ function LandingPage() {
     );
 }
 
-// Komponen Kecil untuk Mempercantik Kodingan
 function BadgeHighlight({ text }) {
     return (
         <span className="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 mb-3 fw-normal">

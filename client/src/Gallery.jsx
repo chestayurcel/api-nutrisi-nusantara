@@ -11,7 +11,6 @@ function Gallery() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // State Modal Detail
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   
@@ -33,7 +32,6 @@ function Gallery() {
 
   const fetchRecipes = async () => {
     try {
-      // Request ke Backend menggunakan API Key milik User yang sedang login
       const response = await axios.get(`${API_BASE_URL}/recipes`, {
         headers: { 'x-api-key': user.api_key }
       });
@@ -41,7 +39,6 @@ function Gallery() {
       setLoading(false);
     } catch (err) {
       console.error("Gagal mengambil data:", err);
-      // Jika error 401/403 (Key tidak valid/habis), logout paksa
       if (err.response && (err.response.status === 401 || err.response.status === 403)) {
           alert("Sesi habis atau kuota API Key Anda habis. Silakan login ulang.");
           localStorage.removeItem('user_data');
@@ -75,15 +72,12 @@ function Gallery() {
       
       <Navigation />
 
-      {/* --- KONTEN UTAMA --- */}
       <Container className="py-5 mt-3">
         
-        {/* Header Section */}
         <div className="text-center mb-5">
             <h2 className="fw-bold text-dark display-6">Koleksi Resep Nusantara</h2>
             <p className="text-muted">Akses data kuliner eksklusif dengan rincian nutrisi presisi.</p>
             
-            {/* Search Bar Mewah */}
             <Row className="justify-content-center mt-4">
                 <Col md={6}>
                     <InputGroup className="shadow-sm rounded-pill overflow-hidden border">
@@ -102,7 +96,6 @@ function Gallery() {
             </Row>
         </div>
 
-        {/* Loading Spinner */}
         {loading && (
             <div className="text-center py-5">
                 <Spinner animation="border" variant="success" />
@@ -110,7 +103,6 @@ function Gallery() {
             </div>
         )}
 
-        {/* State Data Kosong */}
         {!loading && filteredRecipes.length === 0 && (
             <div className="text-center py-5">
                 <h3 className="text-muted">🍲</h3>
@@ -161,11 +153,9 @@ function Gallery() {
         {selectedRecipe && (
             <>
                 <Modal.Header closeButton className="border-0 pb-0">
-                    {/* Header kosong agar lebih bersih */}
                 </Modal.Header>
                 <Modal.Body className="px-4 pb-4">
                     <Row>
-                        {/* Kolom Kiri: Gambar & Instruksi */}
                         <Col md={6}>
                             <h3 className="fw-bold text-emerald mb-3">{selectedRecipe.title}</h3>
                             <img 
