@@ -27,7 +27,7 @@ function LandingPage() {
                                 Coba Gratis
                             </Link>
                             
-                            <a href="http://localhost:3000/api-docs" target="_blank" rel="noreferrer" className="btn btn-outline-success btn-lg rounded-pill px-4">
+                            <a href="" target="_blank" rel="noreferrer" className="btn btn-outline-success btn-lg rounded-pill px-4">
                                 Baca Dokumentasi ↗
                             </a>
                         </div>
