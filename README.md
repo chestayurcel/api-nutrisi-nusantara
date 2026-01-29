@@ -1,6 +1,7 @@
 # 🌿 NusaNutrisi - API & Platform Data Kuliner Nusantara
 
-![NusaNutrisi Banner](https://dummyimage.com/1200x400/064e3b/ffffff&text=NusaNutrisi+API+Gateway)
+![NusaNutrisi Banner](<img width="1902" height="749" alt="Screenshot 2026-01-29 141331" src="https://github.com/user-attachments/assets/a7ec3ee4-fc12-4a29-bd01-a6656c85a107" />)
+
 
 > **Gerbang Data Kuliner Premium.** Platform SaaS (Software as a Service) yang menyediakan API data resep masakan Indonesia lengkap dengan informasi nutrisi akurat yang dikalkulasi secara otomatis.
 
