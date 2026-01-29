@@ -60,4 +60,3 @@ graph LR
 <img width="1902" height="749" alt="Screenshot 2026-01-29 141331" src="https://github.com/user-attachments/assets/68bad3c3-aa9a-4900-a6f8-d2aac7ec4f30" />
 <img width="1900" height="879" alt="Screenshot 2026-01-29 142117" src="https://github.com/user-attachments/assets/08dbe83a-0613-4947-a56e-8a8aebe6f846" />
 <img width="909" height="644" alt="Screenshot 2026-01-29 142125" src="https://github.com/user-attachments/assets/9bfda77e-eca4-425a-82f3-d1f1c18f779a" />
-<img width="1123" height="628" alt="Screenshot 2026-01-28 145434" src="https://github.com/user-attachments/assets/cec65643-5a4e-49dd-ad2a-a96fdb11a627" />
