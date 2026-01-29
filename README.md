@@ -56,7 +56,10 @@ graph LR
 
 ---
 
-📸 Screenshots
+## 📸 Screenshots
+
 <img width="1902" height="749" alt="Screenshot 2026-01-29 141331" src="https://github.com/user-attachments/assets/68bad3c3-aa9a-4900-a6f8-d2aac7ec4f30" />
 <img width="1900" height="879" alt="Screenshot 2026-01-29 142117" src="https://github.com/user-attachments/assets/08dbe83a-0613-4947-a56e-8a8aebe6f846" />
 <img width="909" height="644" alt="Screenshot 2026-01-29 142125" src="https://github.com/user-attachments/assets/9bfda77e-eca4-425a-82f3-d1f1c18f779a" />
+<img width="1919" height="912" alt="Screenshot 2026-01-29 142138" src="https://github.com/user-attachments/assets/932ecacd-ef75-4a79-9711-70ffcdc2cd21" />
+
